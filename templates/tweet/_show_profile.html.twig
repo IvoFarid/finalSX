@@ -1,0 +1,129 @@
+<turbo-frame id="viewTweet" class="flex flex-col max-h-full h-auto" action="replace">
+  {% if fatherTweets %}
+    {% for tweet in fatherTweets %}
+      <div class="flex gap-2 h-fit w-full p-2 text-start border-b border-slate-300">
+        <div class="w-auto max-w-auto min-w-auto flex gap-1">
+          <div class="w-[35px] h-[35px]">
+            <img src="{{tweet.author.photo ? (tweet.author.photo):('/default.jpg')}}" alt="userPhoto" class="w-full h-full rounded-full" data-userActions-target="photo">
+          </div>
+        </div>
+        <div class="flex flex-col justify-between w-full">
+          <div class="flex justify-between items-center">
+            <div class="flex gap-1">
+              <a href="{{ path('app_user_show', { "id": tweet.author.id })}}" class="text-sm font-semibold border-b-2 border-transparent hover:border-b-2 hover:border-zinc-800">{{tweet.author.username}}</a>
+              <p class="text-sm text-gray-400 font-light">{{tweet.author.email}}</p>
+            </div>
+            <p class="text-sm text-gray-400 font-light">{{ tweet.createdAt|date("m/d/Y H:i")}}</p>
+          </div>
+          <div>
+            <p class="text-sm font-thin">{{ tweet.description }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+      <div class="flex gap-2 h-fit w-full p-2 text-start border-b border-slate-300">
+        <div class="w-auto max-w-auto min-w-auto flex gap-1">
+          <div class="pt-[12px] h-full">
+            <a href="{{ path('app_user_show', {'id': tweet.author.id}) }}">
+                <svg width="14" height="14" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.5 8L1.5 8M1.5 8L8.25 14.75M1.5 8L8.25 1.25" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+          </div>
+          <div class="w-[35px] h-[35px]">
+            <img src="{{tweet.author.photo ? (tweet.author.photo):('/default.jpg')}}" alt="userPhoto" class="w-full h-full rounded-full" data-userActions-target="photo">
+          </div>
+        </div>
+        <div class="flex flex-col justify-between w-full">
+          <div class="flex justify-between items-center">
+            <div class="flex gap-1">
+              <a href="{{ path('app_user_show', { "id": tweet.author.id })}}" class="text-sm font-semibold border-b-2 border-transparent hover:border-b-2 hover:border-zinc-800">{{tweet.author.username}}</a>
+              <p class="text-sm text-gray-400 font-light">{{tweet.author.email}}</p>
+            </div>
+            <p class="text-sm text-gray-400 font-light">{{ tweet.createdAt|date("m/d/Y H:i")}}</p>
+          </div>
+          <div>
+            <p class="text-sm font-thin">{{ tweet.description }}</p>
+          </div>
+        </div>
+      </div>
+      <div id="append_tweet"></div>
+      {% if app.user %}
+      <form action="{{path('app_tweet_new')}}" method="post" class="p-1 bg-slate-200 w-full border-b border-b-slate-300 flex justify-between gap-1">
+        <input type="hidden" name="idtweet" value="{{tweet.id}}">
+        <input type="text" autocomplete="off" placeholder="reply to this tweet" name="description" class=" text-sm bg-transparent p-1 w-full outline-none focus:bg-white rounded-md">
+          <button type="submit" autocomplete="off" class="bg-slate-300 p-1 rounded-full text-normal hover:bg-white transition">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 9V15M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#0F172A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form> 
+      {% else %}
+        <div class="bg-slate-200 p-2 border-b border-b-slate-300 w-full">
+          <p class="text-sm font-thin">sign in to reply!</p>
+        </div>
+      {% endif %}
+  {% else %}
+      <div class="flex gap-2 h-fit w-full p-2 text-start border-b border-slate-300">
+        <div class="w-auto max-w-auto min-w-auto flex gap-1">
+          <div class="pt-[12px] h-full">
+            <a href="{{ path('app_user_show', {'id': tweet.author.id}) }}">
+                <svg width="14" height="14" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.5 8L1.5 8M1.5 8L8.25 14.75M1.5 8L8.25 1.25" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+          </div>
+          <div class="bg-yellow-200 rounded-full w-[35px] h-[35px]"></div>
+        </div>
+        <div class="flex flex-col justify-between w-full">
+          <div class="flex justify-between items-center">
+            <div class="flex gap-1">
+              <a href="{{ path('app_user_show', { "id": tweet.author.id })}}" class="text-sm font-semibold border-b-2 border-transparent hover:border-b-2 hover:border-zinc-800">{{tweet.author.username}}</a>
+              <p class="text-sm text-gray-400 font-light">{{tweet.author.email}}</p>
+            </div>
+            <p class="text-sm text-gray-400 font-light">{{ tweet.createdAt|date("m/d/Y H:i")}}</p>
+          </div>
+          <div>
+            <p class="text-sm font-thin">{{ tweet.description }}</p>
+          </div>
+        </div>
+      </div>
+      <div id="append_tweet"></div>
+      {% if app.user %}
+      <form action="{{path('app_tweet_new')}}" method="post" class="p-1 bg-slate-200 w-full border-b border-b-slate-300 flex justify-between gap-1">
+        <input type="hidden" name="idtweet" value="{{tweet.id}}">
+        <input type="text" autocomplete="off" placeholder="reply to this tweet" name="description" class=" text-sm bg-transparent p-1 w-full outline-none focus:bg-white rounded-md">
+          <button type="submit" class="bg-slate-300 p-1 rounded-full text-normal hover:bg-white transition">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9V15M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#0F172A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+      </form>
+      {% else %}
+        <div class="bg-slate-200 p-2 border-b border-b-slate-300 w-full">
+          <p class="text-sm font-thin">sign in to reply!</p>
+        </div>
+      {% endif %}      
+  {% endif %}
+  {% if childrens %}
+        {% for tweet in childrens %}
+          <div class="flex gap-2 h-fit w-full p-2 text-start border-b border-slate-300">
+            <div class="w-auto max-w-auto min-w-auto flex gap-1">
+              <div class="bg-yellow-200 pl-[14px] rounded-full w-[35px] h-[35px]"></div>
+            </div>
+            <div class="flex flex-col justify-between w-full">
+              <div class="flex justify-between items-center">
+                <div class="flex gap-1">
+                  <a href="{{ path('app_user_show', { "id": tweet.author.id })}}" class="text-sm font-semibold border-b-2 border-transparent hover:border-b-2 hover:border-zinc-800">{{tweet.author.username}}</a>
+                  <p class="text-sm text-gray-400 font-light">{{tweet.author.email}}</p>
+                </div>
+                <p class="text-sm text-gray-400 font-light">{{ tweet.createdAt|date("m/d/Y H:i")}}</p>
+              </div>
+              <div>
+                <p class="text-sm font-thin">{{ tweet.description }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+</turbo-frame>

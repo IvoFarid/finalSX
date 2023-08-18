@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Tweet{% endblock %}
+
+{% block body %}
+    <h1>Create new Tweet</h1>
+
+    <form action="{{ path('app_tweet_new') }}" method="POST">
+      <label for="description">enter your tweet</label>
+      <input type="text" name="description" id="description" class="border border-slate-700 rounded-sm m-1">
+      <button type="submit">submit</button>
+    </form>
+    <a href="{{ path('app_tweet_index') }}">back to list</a>
+{% endblock %}

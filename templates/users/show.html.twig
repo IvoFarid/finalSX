@@ -1,0 +1,310 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}XClone | Profile{% endblock %}
+{% block body %}
+
+  <div class="flex flex-col bg-transparent max-h-[calc(100%-62px)] h-[calc(100%-62px)] gap-2">
+    <div 
+    data-controller="userActions"
+    data-userActions-qfollowers-value={{user.followers}}
+    data-userActions-qfollowing-value={{user.following}}
+    data-userActions-userlogged-value={{app.user.id}}
+    data-userActions-imagepath-value={{user.photo}}
+    data-userActions-username-value={{user.username}}
+    data-userActions-userprofile-value={{user.id}}
+    data-userActions-usermail-value={{user.email}}
+    class="p-3 flex w-full justify-between gap-5 border-b border-slate-300 bg-slate-200 rounded-t-lg">
+      <div class="flex gap-3 p-3 w-2/4" data-search-editon-class="hidden" data-userActions-target="userdata">
+        <div class="w-[60px] h-[60px]">
+          <img src="{{user.photo ? (user.photo):('/default.jpg')}}" alt="userPhoto" class="w-full h-full rounded-full" data-userActions-target="photo">
+        </div>
+        <div class="flex flex-col">
+          <div class="flex gap-1 items-center">
+            <p class="text-xs text-slate-400 select-none">{{ user.email }}</p>
+              {% if app.user == user %}
+                <div class="text-xs font-semibold rounded-lg bg-transparent text-zinc-800 px-1 hover:bg-zinc-800 hover:text-slate-50 border border-zinc-800 transition">
+                  <button data-action="click->userActions#showEditMenu" data-userActions-action-param="editTrue" data-userActions-target="editbtn">Edit Profile</button>
+                </div>
+              {% else %}
+                {% set userRelation = urelations.findIfExistsRelation(app.user, user) %}
+                {% if userRelation %}
+                  <div class="text-xs font-semibold">
+                    <button
+                    class="text-red-700 select-none rounded-lg px-1 border border-red-700 hover:bg-red-700 hover:text-slate-50 transition"
+                    data-action="click->userActions#setFollow"
+                    data-userActions-action-param="unfollow"
+                    data-userActions-target="bfollow">Unfollow
+                    </button>
+                  </div>
+                {% else %}
+                  <div class="text-xs font-semibold">
+                    <button
+                    class="text-blue-700 select-none px-1 rounded-lg border border-blue-700 hover:bg-blue-700 hover:text-slate-50 transition"
+                    data-action="click->userActions#setFollow"
+                    data-userActions-action-param="follow"
+                    data-userActions-target="bfollow">Follow
+                    </button>
+                  </div>
+                {% endif %}
+              {% endif %}
+          </div>
+          <div class="flex items-center">
+            <p data-userActions-target="username" class="text-4xl font-bold text-zinc-700 select-none">{{ user.username }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="h-full w-2/4 p-4 flex justify-around">
+        <div class="flex flex-col justify-center items-center">
+          <p class="text-sm text-slate-400">followers</p>
+          <p 
+          data-userActions-target="qfollowers"
+          class="text-4xl font-bold text-zinc-700">{{user.followers}}</p>
+        </div>
+
+        <div class="flex flex-col justify-center items-center">
+          <p class="text-sm text-slate-400">following</p>
+          <p 
+          data-userActions-target="qfollowing"
+          class="text-4xl font-bold text-zinc-700">{{user.following}}</p>
+        </div>
+
+        <div class="flex flex-col justify-center items-center">
+          <p class="text-sm text-slate-400">tweets</p>
+          <p 
+          data-userActions-target="qtweets"
+          class="text-4xl font-bold text-zinc-700">{{user.qtweets}}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="h-[calc(100%-145px)] max-h-[calc(100%-145px)] py-2 flex gap-5 justify-between">
+      <div class="rounded-md w-3/5 overflow-y-auto flex flex-col items-center">
+      {% if tweets %}
+        {% for tweet in tweets %}
+           <turbo-frame id="delete_tweet_{{tweet.id}}" 
+           class="h-auto border-b border-slate-300 hover:bg-slate-200 transition p-2 flex gap-1 w-full min-w-full" 
+              data-tweetActions-qlikes-value={{tweet.likes}} 
+              data-tweetActions-tweetid-value={{tweet.id}} 
+              data-tweetActions-qretweets-value={{tweet.retweets}} 
+              data-tweetActions-qsaved-value={{tweet.saved}}
+              data-controller="tweetActions">
+                  <div class="w-[40px] max-w-[40px] min-w-[40px] h-full min-h-full mx-auto">
+                     <img src="{{tweet.author.photo ? (tweet.author.photo):('/default.jpg')}}" alt="userPhoto" class="w-[35px] min-h-[35px] h-[35px] min-w-[35px] rounded-full" data-userActions-target="photo">
+                  </div>
+                  <div class="flex flex-col justify-between w-full">
+                    <div class="flex justify-between">
+                      <div class="flex gap-1">
+                        <a href="{{ path('app_user_show', { "id": tweet.author.id })}}" data-turbo="false" class="text-sm font-semibold border-b-2 border-transparent hover:border-b-2 hover:border-zinc-800">{{tweet.author.username}}</a>
+                        <p class="text-sm text-gray-400 font-light">{{tweet.author.email}}</p>
+                      </div>
+                      {% if app.user == tweet.author %}
+                      {# THE TURBO FRAME HERE MAYBE ONLY NEEDS TO BE A SIMPLE DIV.  DELETE BTN NOT WORKING. TEST NETWORK, SEE HTML IN ELEMENT INSPECTOR. VIEW PATH. #}
+                       <form action="{{path('app_tweet_action', { 'id': tweet.id, 'typeAction': 'deleteTweetProfile' })}}" method="POST" data-turbo="false">
+                          <button type="submit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M14.7404 9L14.3942 18M9.60577 18L9.25962 9M19.2276 5.79057C19.5696 5.84221 19.9104 5.89747 20.25 5.95629M19.2276 5.79057L18.1598 19.6726C18.0696 20.8448 17.0921 21.75 15.9164 21.75H8.08357C6.90786 21.75 5.93037 20.8448 5.8402 19.6726L4.77235 5.79057M19.2276 5.79057C18.0812 5.61744 16.9215 5.48485 15.75 5.39432M3.75 5.95629C4.08957 5.89747 4.43037 5.84221 4.77235 5.79057M4.77235 5.79057C5.91878 5.61744 7.07849 5.48485 8.25 5.39432M15.75 5.39432V4.47819C15.75 3.29882 14.8393 2.31423 13.6606 2.27652C13.1092 2.25889 12.5556 2.25 12 2.25C11.4444 2.25 10.8908 2.25889 10.3394 2.27652C9.16065 2.31423 8.25 3.29882 8.25 4.47819V5.39432M15.75 5.39432C14.5126 5.2987 13.262 5.25 12 5.25C10.738 5.25 9.48744 5.2987 8.25 5.39432" stroke="red" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <p class="text-sm font-thin">{{ tweet.description }}</p>
+                    </div> 
+                    {% if app.user %}
+                      <div class="flex justify-end gap-2">
+                      {# <div class="flex items-center">
+                        <a
+                        href="{{ path('app_tweet_show', {"id": tweet.id}) }}"
+                        data-turbo-frame="viewTweet"
+                        class="transition hover:bg-white rounded-full p-1">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.03555 12.3224C1.96647 12.1151 1.9664 11.8907 2.03536 11.6834C3.42373 7.50972 7.36079 4.5 12.0008 4.5C16.6387 4.5 20.5742 7.50692 21.9643 11.6776C22.0334 11.8849 22.0335 12.1093 21.9645 12.3166C20.5761 16.4903 16.6391 19.5 11.9991 19.5C7.3612 19.5 3.42564 16.4931 2.03555 12.3224Z" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </a>
+                      </div> #}
+                      <div class="flex items-center text-sm" >
+                        {% set likeRelation = trelations.findIfExistsLike(tweet.id, app.user) %}
+                        {% if likeRelation %}
+                          <button
+                            data-action="click->tweetActions#setLike" 
+                            data-tweetActions-action-param="dislike" 
+                            data-tweetActions-target="blike"
+                            class="hover:bg-red-500 transition rounded-full p-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M11.645 20.9107L11.6384 20.9072L11.6158 20.8949C11.5965 20.8844 11.5689 20.8693 11.5336 20.8496C11.4629 20.8101 11.3612 20.7524 11.233 20.6769C10.9765 20.5261 10.6132 20.3039 10.1785 20.015C9.31074 19.4381 8.15122 18.5901 6.9886 17.5063C4.68781 15.3615 2.25 12.1751 2.25 8.25C2.25 5.32194 4.7136 3 7.6875 3C9.43638 3 11.0023 3.79909 12 5.0516C12.9977 3.79909 14.5636 3 16.3125 3C19.2864 3 21.75 5.32194 21.75 8.25C21.75 12.1751 19.3122 15.3615 17.0114 17.5063C15.8488 18.5901 14.6893 19.4381 13.8215 20.015C13.3868 20.3039 13.0235 20.5261 12.767 20.6769C12.6388 20.7524 12.5371 20.8101 12.4664 20.8496C12.4311 20.8693 12.4035 20.8844 12.3842 20.8949L12.3616 20.9072L12.355 20.9107L12.3523 20.9121C12.1323 21.0289 11.8677 21.0289 11.6477 20.9121L11.645 20.9107Z" fill="#ef233c" stroke="#ef233c" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        {% else %}
+                          <button
+                            data-action="click->tweetActions#setLike" 
+                            data-tweetActions-action-param="like"
+                            data-tweetActions-target="blike"
+                            class="hover:bg-red-500 transition rounded-full p-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M11.645 20.9107L11.6384 20.9072L11.6158 20.8949C11.5965 20.8844 11.5689 20.8693 11.5336 20.8496C11.4629 20.8101 11.3612 20.7524 11.233 20.6769C10.9765 20.5261 10.6132 20.3039 10.1785 20.015C9.31074 19.4381 8.15122 18.5901 6.9886 17.5063C4.68781 15.3615 2.25 12.1751 2.25 8.25C2.25 5.32194 4.7136 3 7.6875 3C9.43638 3 11.0023 3.79909 12 5.0516C12.9977 3.79909 14.5636 3 16.3125 3C19.2864 3 21.75 5.32194 21.75 8.25C21.75 12.1751 19.3122 15.3615 17.0114 17.5063C15.8488 18.5901 14.6893 19.4381 13.8215 20.015C13.3868 20.3039 13.0235 20.5261 12.767 20.6769C12.6388 20.7524 12.5371 20.8101 12.4664 20.8496C12.4311 20.8693 12.4035 20.8844 12.3842 20.8949L12.3616 20.9072L12.355 20.9107L12.3523 20.9121C12.1323 21.0289 11.8677 21.0289 11.6477 20.9121L11.645 20.9107Z" stroke="#0F172A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        {% endif %}
+                        <p class="text-xs" data-tweetActions-target="qlikes">{{tweet.likes}}</p>
+                      </div>
+                      <div class="flex items-center">
+                        {% set retweetRelation = trelations.findIfExistsRt(tweet.id, app.user) %}
+                        {% if retweetRelation %}
+                          <button 
+                            data-action="click->tweetActions#setRetweet" 
+                            data-tweetActions-action-param="deleteRtw" 
+                            data-tweetActions-target="bretweet"
+                            class="hover:bg-blue-500 transition rounded-full p-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#023e8a22" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.5 12C19.5 10.7681 19.4536 9.54699 19.3624 8.3384C19.2128 6.35425 17.6458 4.78724 15.6616 4.63757C14.453 4.54641 13.2319 4.5 12 4.5C10.7681 4.5 9.54699 4.54641 8.3384 4.63757C6.35425 4.78724 4.78724 6.35425 4.63757 8.3384C4.62097 8.55852 4.60585 8.77906 4.59222 9M19.5 12L22.5 9M19.5 12L16.5 9M4.5 12C4.5 13.2319 4.54641 14.453 4.63757 15.6616C4.78724 17.6458 6.35425 19.2128 8.3384 19.3624C9.54699 19.4536 10.7681 19.5 12 19.5C13.2319 19.5 14.453 19.4536 15.6616 19.3624C17.6458 19.2128 19.2128 17.6458 19.3624 15.6616C19.379 15.4415 19.3941 15.2209 19.4078 15M4.5 12L7.5 15M4.5 12L1.5 15" stroke="#023e8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        {% else %}
+                          <button 
+                            data-action="click->tweetActions#setRetweet"
+                            data-tweetActions-action-param="addRtw"
+                            data-tweetActions-target="bretweet"
+                            class="hover:bg-blue-500 transition rounded-full p-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.5 12C19.5 10.7681 19.4536 9.54699 19.3624 8.3384C19.2128 6.35425 17.6458 4.78724 15.6616 4.63757C14.453 4.54641 13.2319 4.5 12 4.5C10.7681 4.5 9.54699 4.54641 8.3384 4.63757C6.35425 4.78724 4.78724 6.35425 4.63757 8.3384C4.62097 8.55852 4.60585 8.77906 4.59222 9M19.5 12L22.5 9M19.5 12L16.5 9M4.5 12C4.5 13.2319 4.54641 14.453 4.63757 15.6616C4.78724 17.6458 6.35425 19.2128 8.3384 19.3624C9.54699 19.4536 10.7681 19.5 12 19.5C13.2319 19.5 14.453 19.4536 15.6616 19.3624C17.6458 19.2128 19.2128 17.6458 19.3624 15.6616C19.379 15.4415 19.3941 15.2209 19.4078 15M4.5 12L7.5 15M4.5 12L1.5 15" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        {% endif %}
+                        <p class="text-xs" data-tweetActions-target="qretweets">{{ tweet.retweets }}</p>
+                      </div>
+                      <div class="flex items-center">
+                        {% set savedRelation = trelations.findIfExistsSave(tweet.id, app.user) %}
+                        {% if savedRelation %}
+                          <button
+                          data-action="click->tweetActions#setSaved"
+                          data-tweetActions-action-param="deleteSave"
+                          data-tweetActions-target="bsave"
+                          class="hover:bg-zinc-500 transition rounded-full p-1">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M6.32022 2.57741C8.18374 2.36114 10.079 2.25 12 2.25C13.921 2.25 15.8163 2.36114 17.6798 2.57741C19.1772 2.75119 20.25 4.03722 20.25 5.50699V21C20.25 21.2599 20.1154 21.5013 19.8943 21.638C19.6732 21.7746 19.3971 21.7871 19.1646 21.6708L12 18.0885L4.83541 21.6708C4.60292 21.7871 4.32681 21.7746 4.1057 21.638C3.88459 21.5013 3.75 21.2599 3.75 21V5.50699C3.75 4.03722 4.82283 2.75119 6.32022 2.57741Z" fill="#0F172A"/>
+                          </svg>
+                          </button>
+                        {% else %}
+                          <button
+                          data-action="click->tweetActions#setSaved"
+                          data-tweetActions-action-param="save"
+                          data-tweetActions-target="bsave"
+                          class="hover:bg-zinc-500 transition rounded-full p-1">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.5933 3.32241C18.6939 3.45014 19.5 4.399 19.5 5.50699V21L12 17.25L4.5 21V5.50699C4.5 4.399 5.30608 3.45014 6.40668 3.32241C8.24156 3.10947 10.108 3 12 3C13.892 3 15.7584 3.10947 17.5933 3.32241Z" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          </button>
+                        {% endif %}
+                        <p class="text-xs" data-tweetActions-target="qsaved">{{tweet.saved}}</p>
+                      </div>
+                      <div class="flex items-center gap-1">
+
+
+                      {# ESTO DEBE CAMBIAR. SER OTRO TURBO FRAME A OTRA URL QUE DIBUJE EL MISMO LAYOUT PERO UN DISTINTO BOTON DE RETORNO. #}
+                      <a
+                        {# data-tweetActions-target="tweetclick"
+                        data-action="click->tweetActions#setClicked" #}
+                        href="{{ path('app_profile_show_tweet', {"id": tweet.id}) }}"
+                        data-turbo-frame="viewTweet"
+                        class="transition hover:bg-white rounded-full p-1">
+                        <svg width="16" height="16" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7.625 7.75C7.625 7.95711 7.45711 8.125 7.25 8.125C7.04289 8.125 6.875 7.95711 6.875 7.75C6.875 7.54289 7.04289 7.375 7.25 7.375C7.45711 7.375 7.625 7.54289 7.625 7.75ZM7.625 7.75H7.25M11.375 7.75C11.375 7.95711 11.2071 8.125 11 8.125C10.7929 8.125 10.625 7.95711 10.625 7.75C10.625 7.54289 10.7929 7.375 11 7.375C11.2071 7.375 11.375 7.54289 11.375 7.75ZM11.375 7.75H11M15.125 7.75C15.125 7.95711 14.9571 8.125 14.75 8.125C14.5429 8.125 14.375 7.95711 14.375 7.75C14.375 7.54289 14.5429 7.375 14.75 7.375C14.9571 7.375 15.125 7.54289 15.125 7.75ZM15.125 7.75H14.75M1.25 10.7593C1.25 12.3604 2.37341 13.754 3.95746 13.987C5.04357 14.1467 6.14151 14.27 7.25 14.3556V19L11.4335 14.8165C11.6402 14.6098 11.9193 14.4923 12.2116 14.485C14.1872 14.4361 16.1331 14.2678 18.0425 13.9871C19.6266 13.7542 20.75 12.3606 20.75 10.7595V4.74056C20.75 3.13946 19.6266 1.74583 18.0425 1.51293C15.744 1.17501 13.3926 1 11.0003 1C8.60776 1 6.25612 1.17504 3.95747 1.51302C2.37342 1.74593 1.25 3.13956 1.25 4.74064V10.7593Z" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </a>
+                        <p class="text-xs">{{tweet.comments}}</p>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="flex justify-end gap-2">
+                      {# <div class="flex items-center">
+                        <a
+                        href="{{ path('app_tweet_show', {"id": tweet.id}) }}"
+                        data-turbo-frame="viewTweet"
+                        class="transition hover:bg-white rounded-full p-1">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.03555 12.3224C1.96647 12.1151 1.9664 11.8907 2.03536 11.6834C3.42373 7.50972 7.36079 4.5 12.0008 4.5C16.6387 4.5 20.5742 7.50692 21.9643 11.6776C22.0334 11.8849 22.0335 12.1093 21.9645 12.3166C20.5761 16.4903 16.6391 19.5 11.9991 19.5C7.3612 19.5 3.42564 16.4931 2.03555 12.3224Z" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </a>
+                      </div> #}
+                      <div class="flex items-center text-sm" >
+                          <button
+                          disabled
+                            data-action="click->tweetActions#setLike" 
+                            data-tweetActions-action-param="like"
+                            data-tweetActions-target="blike"
+                            class="hover:bg-red-500 transition rounded-full p-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M11.645 20.9107L11.6384 20.9072L11.6158 20.8949C11.5965 20.8844 11.5689 20.8693 11.5336 20.8496C11.4629 20.8101 11.3612 20.7524 11.233 20.6769C10.9765 20.5261 10.6132 20.3039 10.1785 20.015C9.31074 19.4381 8.15122 18.5901 6.9886 17.5063C4.68781 15.3615 2.25 12.1751 2.25 8.25C2.25 5.32194 4.7136 3 7.6875 3C9.43638 3 11.0023 3.79909 12 5.0516C12.9977 3.79909 14.5636 3 16.3125 3C19.2864 3 21.75 5.32194 21.75 8.25C21.75 12.1751 19.3122 15.3615 17.0114 17.5063C15.8488 18.5901 14.6893 19.4381 13.8215 20.015C13.3868 20.3039 13.0235 20.5261 12.767 20.6769C12.6388 20.7524 12.5371 20.8101 12.4664 20.8496C12.4311 20.8693 12.4035 20.8844 12.3842 20.8949L12.3616 20.9072L12.355 20.9107L12.3523 20.9121C12.1323 21.0289 11.8677 21.0289 11.6477 20.9121L11.645 20.9107Z" stroke="#0F172A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        <p class="text-xs" data-tweetActions-target="qlikes">{{tweet.likes}}</p>
+                      </div>
+                      <div class="flex items-center">
+                          <button 
+                          disabled
+                            data-action="click->tweetActions#setRetweet"
+                            data-tweetActions-action-param="addRtw"
+                            data-tweetActions-target="bretweet"
+                            class="hover:bg-blue-500 transition rounded-full p-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.5 12C19.5 10.7681 19.4536 9.54699 19.3624 8.3384C19.2128 6.35425 17.6458 4.78724 15.6616 4.63757C14.453 4.54641 13.2319 4.5 12 4.5C10.7681 4.5 9.54699 4.54641 8.3384 4.63757C6.35425 4.78724 4.78724 6.35425 4.63757 8.3384C4.62097 8.55852 4.60585 8.77906 4.59222 9M19.5 12L22.5 9M19.5 12L16.5 9M4.5 12C4.5 13.2319 4.54641 14.453 4.63757 15.6616C4.78724 17.6458 6.35425 19.2128 8.3384 19.3624C9.54699 19.4536 10.7681 19.5 12 19.5C13.2319 19.5 14.453 19.4536 15.6616 19.3624C17.6458 19.2128 19.2128 17.6458 19.3624 15.6616C19.379 15.4415 19.3941 15.2209 19.4078 15M4.5 12L7.5 15M4.5 12L1.5 15" stroke="#0F172A" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        <p class="text-xs" data-tweetActions-target="qretweets">{{ tweet.retweets }}</p>
+                      </div>
+                      <div class="flex items-center">
+                          <button
+                          disabled
+                          data-action="click->tweetActions#setSaved"
+                          data-tweetActions-action-param="save"
+                          data-tweetActions-target="bsave"
+                          class="hover:bg-zinc-500 transition rounded-full p-1">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.5933 3.32241C18.6939 3.45014 19.5 4.399 19.5 5.50699V21L12 17.25L4.5 21V5.50699C4.5 4.399 5.30608 3.45014 6.40668 3.32241C8.24156 3.10947 10.108 3 12 3C13.892 3 15.7584 3.10947 17.5933 3.32241Z" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          </button>
+                        <p class="text-xs" data-tweetActions-target="qsaved">{{tweet.saved}}</p>
+                      </div>
+                      <div class="flex items-center gap-1">
+                      <a
+                        href="{{ path('app_tweet_show', {"id": tweet.id}) }}"
+                        data-turbo-frame="viewTweet"
+                        class="transition hover:bg-white rounded-full p-1">
+                        <svg width="16" height="16" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7.625 7.75C7.625 7.95711 7.45711 8.125 7.25 8.125C7.04289 8.125 6.875 7.95711 6.875 7.75C6.875 7.54289 7.04289 7.375 7.25 7.375C7.45711 7.375 7.625 7.54289 7.625 7.75ZM7.625 7.75H7.25M11.375 7.75C11.375 7.95711 11.2071 8.125 11 8.125C10.7929 8.125 10.625 7.95711 10.625 7.75C10.625 7.54289 10.7929 7.375 11 7.375C11.2071 7.375 11.375 7.54289 11.375 7.75ZM11.375 7.75H11M15.125 7.75C15.125 7.95711 14.9571 8.125 14.75 8.125C14.5429 8.125 14.375 7.95711 14.375 7.75C14.375 7.54289 14.5429 7.375 14.75 7.375C14.9571 7.375 15.125 7.54289 15.125 7.75ZM15.125 7.75H14.75M1.25 10.7593C1.25 12.3604 2.37341 13.754 3.95746 13.987C5.04357 14.1467 6.14151 14.27 7.25 14.3556V19L11.4335 14.8165C11.6402 14.6098 11.9193 14.4923 12.2116 14.485C14.1872 14.4361 16.1331 14.2678 18.0425 13.9871C19.6266 13.7542 20.75 12.3606 20.75 10.7595V4.74056C20.75 3.13946 19.6266 1.74583 18.0425 1.51293C15.744 1.17501 13.3926 1 11.0003 1C8.60776 1 6.25612 1.17504 3.95747 1.51302C2.37342 1.74593 1.25 3.13956 1.25 4.74064V10.7593Z" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </a>
+                        <p class="text-xs">{{tweet.comments}}</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+              </turbo-frame>
+        {% endfor %}
+      {% else %}
+        <p class="text-sm text-slate-600">this user hasn't tweeted anything yet :/</p>
+      {% endif %}
+        {# here should also show the tweets retweeted. #}
+      </div>
+      <turbo-frame id="viewTweet" class="border bg-slate-200 rounded-md w-2/5 flex flex-col h-full min-h-full">
+        <div class="flex border border-b-slate-300 w-full text-sm">
+          <a href="{{path('app_user_following', {'id': user.id})}}" class="hover:bg-zinc-800 text-zinc-700 hover:text-slate-50 w-1/3 transition text-center p-2">
+            following
+          </a>
+          <a href="{{path('app_user_followers', {'id': user.id})}}" class="hover:bg-zinc-800 hover:text-slate-50 w-1/3 text-center p-2">
+            followers
+          </a>
+          <a href="{{path('app_user_liked', {'id': user.id})}}" class="hover:bg-zinc-800 hover:text-slate-50 w-1/3 text-center p-2">
+            liked
+          </a>
+        </div>
+        <div class="pt-3">
+          <p class="text-sm text-slate-400 text-center">click on any tab or tweet to see more</p>
+        </div>
+      </turbo-frame>
+    </div>
+  </div>
+{% endblock %}

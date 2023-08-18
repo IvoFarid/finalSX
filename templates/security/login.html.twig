@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}XClone | Login{% endblock %}
+
+{% block body %}
+{# <form method="post">
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label for="inputEmail">Email</label>
+    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+    <label for="inputPassword">Password</label>
+    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+
+    <input type="hidden" name="_csrf_token"
+           value="{{ csrf_token('authenticate') }}"
+    >
+
+    <button class="btn btn-lg btn-primary" type="submit">
+        Sign in
+    </button>
+</form> #}
+<div class="max-w-md w-full mx-auto p-8 rounded-md">
+        <h1 class="text-xl font-semibold mb-6 text-center">Login</h1>
+        {% if error %}
+        <p class="text-xs font-semibold text-center text-red-600">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+    {% endif %}
+        <form method="post" class="flex flex-col items-center w-full">
+            <div class="mb-4 w-3/4">
+                <label for="inputEmail" class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
+                <input autocomplete="off" type="email" id="inputEmail" name="email" class="text-sm w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+            </div>
+            <div class="mb-4 w-3/4">
+                <label for="inputPassword" class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
+                <input type="password" id="inputPassword" name="password" class="text-sm w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+            </div>
+            <input type="hidden" name="_csrf_token"
+            value="{{ csrf_token('authenticate') }}"
+            >
+            <a class="text-xs text-gray-700 underline mb-1" href="{{ path('app_register') }}">don't have an account?</a>
+            <button type="submit" class="outline-none border-b border-transparent hover:border-b-zinc-800 font-semibold text-zinc-700 hover:text-zinc-900 transition">Login</button>
+        </form>
+    </div>
+{% endblock %}

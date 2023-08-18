@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}XClone | Register{% endblock %}
+
+{% block body %}
+  <div class="max-w-md w-full mx-auto p-8 rounded-md">
+    <h1 class="text-xl font-semibold mb-6 text-center">Register</h1>
+    <form action="{{path('app_register')}}" method="POST" class="flex flex-col items-center w-full">
+      <div class="mb-4 w-3/4">
+        <label for="username" class="block text-gray-700 font-medium mb-2 text-sm">Username</label>
+        <input autocomplete="off" type="username" id="username" name="username" class="text-sm w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+      </div>
+      <div class="mb-4 w-3/4">
+        <label for="email" class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
+        <input autocomplete="off" type="email" id="email" name="email" class="text-sm w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+      </div>
+      <div class="mb-4 w-3/4">
+        <label for="password" class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
+        <input autocomplete="off" type="password" id="password" name="password" class="text-sm w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+      </div>
+      <a class="text-xs text-gray-700 underline mb-1" href="{{ path('app_login') }}">already have an account?</a>
+      <button type="submit" class="outline-none border-b border-transparent hover:border-b-zinc-800 font-semibold text-zinc-700 hover:text-zinc-900 transition">Register</button>
+    </form>
+  </div>
+{% endblock %}

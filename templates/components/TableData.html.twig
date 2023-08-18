@@ -1,0 +1,29 @@
+<table class="table-auto">
+  <thead style="border-bottom: 2px solid darkgrey {{ this.setClasses()}}">
+    <tr>
+      {% for header in tableHeaders %}
+        <th>{{ header }}</th>
+      {% endfor %}
+        <th>actions</th>
+    </tr>
+  </thead>
+  <tbody class="text-center">
+    {% for value in values %}
+      <tr>
+        {% for header in tableHeaders %}
+          <td>{{ attribute(value, tableHeaders[loop.index0]) }}</td>
+        {% endfor %}
+        <td>
+          {% for action in redirectActionsLabel %}
+            <a href="{{ path(redirectActionsPath[loop.index0], { "id": value.id}) }}">{{action}}</a>
+          {% endfor %}
+          {% for action in submitActionsLabel %}
+            <form action="{{ path(submitActionsPath[loop.index0], { "id": value.id}) }}" method="POST">
+              <button class="border border-slate-800 m-1" type="submit">{{submitActionsLabel[loop.index0]}}</button>
+            </form>
+          {% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

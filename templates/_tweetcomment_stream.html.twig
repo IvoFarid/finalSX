@@ -1,0 +1,23 @@
+<turbo-stream target="append_tweet" action="append">
+<template>
+      <div class="flex gap-2 h-fit w-full p-2 text-start border-b border-slate-300">
+        <div class="w-auto max-w-auto min-w-auto flex gap-1">
+          <div class="w-[35px] h-[35px]">
+            <img src="{{tweet.author.photo ? (tweet.author.photo):('/default.jpg')}}" alt="userPhoto" class="w-full h-full rounded-full" data-userActions-target="photo">
+          </div>
+        </div>
+        <div class="flex flex-col justify-between w-full">
+          <div class="flex justify-between items-center">
+            <div class="flex gap-1">
+              <a href="{{ path('app_user_show', { "id": tweet.author.id })}}" class="text-sm font-semibold border-b-2 border-transparent hover:border-b-2 hover:border-zinc-800">{{tweet.author.username}}</a>
+              <p class="text-sm text-gray-400 font-light">{{tweet.author.email}}</p>
+            </div>
+            <p class="text-sm text-gray-400 font-light">{{ tweet.createdAt|date("m/d/Y")}}</p>
+          </div>
+          <div>
+            <p class="text-sm font-thin">{{ tweet.description }}</p>
+          </div>
+        </div>
+      </div>
+</template>
+</turbo-stream>
